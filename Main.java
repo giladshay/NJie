@@ -8,10 +8,16 @@ import java.util.Scanner;
 public class Main {
     private static Scanner input = new Scanner(System.in);
     private static void run(String text) {
-        Lexer lexer = new Lexer("<stdin>", text);
         try {
+            // Generate tokens
+            Lexer lexer = new Lexer("<stdin>", text);
             List<Token> tokens = lexer.makeTokens();
-            System.out.println(tokens);
+           
+            // Generate AST
+            Parser parser = new Parser(tokens);
+            Node ast = parser.parse();
+
+            System.out.println(ast.toString());
         } catch (Error e) {
             System.out.println(e.toString());
         }

@@ -56,7 +56,7 @@ public class Lexer {
                 advance();
             // +, -, *, /, (, or )
             } else if (charOperators.containsKey(getCurrentChar())) {
-                tokens.add(new Token(charOperators.get(getCurrentChar())));
+                tokens.add(new Token(charOperators.get(getCurrentChar()), pos));
                 advance();
             // Numbers
             } else if (Character.isDigit(getCurrentChar())) {
@@ -69,6 +69,7 @@ public class Lexer {
                 throw new IllegalCharError("" + "'" + c + "'", start, pos);
             }
         }
+        tokens.add(new Token(Token.Type.EOF, pos));
         return tokens;
     }
 
@@ -81,6 +82,7 @@ public class Lexer {
         StringBuilder number = new StringBuilder();
         boolean isThereDot = false;
 
+        Position start = pos.copy();
         while (getCurrentChar() != none && (Character.isDigit(getCurrentChar()) || getCurrentChar() == '.')) {
             if (getCurrentChar() == '.') {
                 if (isThereDot)
@@ -91,8 +93,10 @@ public class Lexer {
             advance();
         }
 
-        if (isThereDot)
-            return new ValueableToken(Token.Type.FLOAT, new ValueableToken.Value(Float.valueOf(number.toString())));
-        return new ValueableToken(Token.Type.INT, new ValueableToken.Value(Integer.valueOf(number.toString())));
+        Token.Type type = isThereDot ? Token.Type.FLOAT : Token.Type.INT;
+        ValueableToken.Value value = isThereDot ? 
+            new ValueableToken.Value(Float.valueOf(number.toString())) :
+            new ValueableToken.Value(Integer.valueOf(number.toString()));
+        return new ValueableToken(type, value, start, pos);
     }
 }

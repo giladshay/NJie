@@ -42,9 +42,23 @@ public class ValueableToken extends Token {
      * Initialize a new ValueableToken with the given type and given value.
      * @param type Given type.
      * @param value Given value. 
+     * @param start Starting position.
+     * @param end Ending position.
      */
-    public ValueableToken(Token.Type type, Value value) {
-        super(type);
+    public ValueableToken(Token.Type type, Value value, Position start, Position end) {
+        super(type, start, end);
+        this.value = value;
+    }
+
+    /**
+     * Initialize a new ValueableToken with the given type and value.
+     * Ending position is starting position + 1.
+     * @param type Given type.
+     * @param value Given value.
+     * @param start Starting position.
+     */
+    public ValueableToken(Token.Type type, Value value, Position start) {
+        super(type, start);
         this.value = value;
     }
     
