@@ -34,12 +34,83 @@ public class Parser {
         return idx < tokens.size() ? tokens.get(idx) : tokens.get(tokens.size() - 1);
     }
 
+        /**
+     * Helper method for similar grammar rules of binary operation.
+     * @param leftFunc Function to get the left child (operand).
+     * @param ops Set of operators that can be a binary operator for the current grammar rule that called this function.
+     * @param rightFunc Function to get the right child (operand).
+     * @return Node with the result of the operator.
+     * @throws InvalidSyntaxError Where encountering invalid syntax.
+     */
+    private Node binaryOperations(ThrowableSupplier<Node, InvalidSyntaxError> leftFunc, Set<Token.Type> ops, ThrowableSupplier<Node, InvalidSyntaxError> rightFunc) throws InvalidSyntaxError {
+        Node left = leftFunc.get();
+
+        while (ops.contains(getCurrentToken().getType())) {
+            Token operator = getCurrentToken();
+            advance();
+            Node right = rightFunc.get();
+            left = new BinOpNode(left, operator, right);    
+        }
+        return left;
+    }
+
+    /**
+     * Helper method for using binary operation where left function and right function are the same.
+     * @param func Function to use for left and right children.
+     * @param ops Set of operators that can be a binary operator for the current grammar ruke.
+     * @return Node with the result of the operator.
+     * @throws InvalidSyntaxError Where encountering invalid syntax.
+     */
+    private Node binaryOperation(ThrowableSupplier<Node, InvalidSyntaxError> func, Set<Token.Type> ops) throws InvalidSyntaxError {
+        return binaryOperations(func, ops, func);
+    }
+    
+    /**
+     * Create the tree in the case of factor according to grammar rules.
+     * Recall the atom case is either:
+     * INT | FLOAT
+     * LPAREN expr RPAREN
+     * @return
+     * @throws InvalidSyntaxError
+     */
+    private Node atom() throws InvalidSyntaxError {
+        Token currentToken = getCurrentToken();
+        // INT | FLOAT
+        if (currentToken.getType() == Token.Type.INT || currentToken.getType() == Token.Type.FLOAT) {
+            advance();
+            return new NumberNode((ValueableToken) currentToken); 
+        // LPAREN expr RPAREN   
+        } else if (currentToken.getType() == Token.Type.LPAREN) {
+            advance();
+            Node expr = expr();
+            if (getCurrentToken().getType() == Token.Type.RPAREN) {
+                advance();
+                return expr;
+            }
+            throw new InvalidSyntaxError("Expected ')'", getCurrentToken().getStart(), getCurrentToken().getEnd());
+        } else {
+            throw new InvalidSyntaxError("Expected INT, FLOAT, '+', '-', or ')'", currentToken.getStart(), currentToken.getEnd());
+        }
+    }
+
+    /**
+     * Create the tree in the case of power according to grammar rules.
+     * Recall the power case is:
+     * atom (^ factor)*
+     * @return
+     * @throws InvalidSyntaxError
+     */
+    private Node power() throws InvalidSyntaxError {
+        // atom (^ factor)*
+        return binaryOperations(this::atom, new HashSet<>() {{
+            add(Token.Type.POW);
+        }}, this::factor);
+    }
+
     /**
      * Create the tree in the case of factor according to grammar rules.
      * Recall the factor case is either:
-     * INT | FLOAT
      * (+ | -) factor
-     * LPAREN expr RPAREN
      * @return Node 
      * @throws InvalidSyntaxError Where encountering invalid syntax.
      */
@@ -52,49 +123,13 @@ public class Parser {
             Node factor = factor();
             return new UnOpNode(currentToken, factor);
         }
-    
-        // INT | FLOAT
-        else if (currentToken.getType() == Token.Type.INT || currentToken.getType() == Token.Type.FLOAT) {
-            advance();
-            return new NumberNode((ValueableToken) currentToken); 
-        }
-
-        // LPAREN expr RPAREN
-        else if (currentToken.getType() == Token.Type.LPAREN) {
-            advance();
-            Node expr = expr();
-            if (getCurrentToken().getType() == Token.Type.RPAREN) {
-                advance();
-                return expr;
-            }
-            throw new InvalidSyntaxError("Expectd ')'", getCurrentToken().getStart(), getCurrentToken().getEnd());
-        }
-        throw new InvalidSyntaxError("Expected INT or FLOAT", currentToken.getStart(), currentToken.getEnd());
-    }
-
-    /**
-     * Helper method for similar grammar rules of binary operation.
-     * @param func Function to get the left and right children (operands).
-     * @param ops Set of operators that can be a binary operator for the current grammar rule that called this function.
-     * @return Node with the result of the factor.
-     * @throws InvalidSyntaxError Where encountering invalid syntax.
-     */
-    private Node binaryOperation(ThrowableSupplier<Node, InvalidSyntaxError> func, Set<Token.Type> ops) throws InvalidSyntaxError {
-        Node left = func.get();
-
-        while (ops.contains(getCurrentToken().getType())) {
-            Token operator = getCurrentToken();
-            advance();
-            Node right = func.get();
-            left = new BinOpNode(left, operator, right);    
-        }
-        return left;
+        return power();
     }
 
     /**
      * Create the tree in the case of term according to grammar rules. 
      * Recall the term case is:
-     * factor ((* | /) factor)
+     * factor ((* | /) factor)*
      * @return Node with the result of the term.
      * @throws InvalidSyntaxError Where encountering invalid syntax.
      */

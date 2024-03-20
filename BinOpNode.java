@@ -40,6 +40,9 @@ public class BinOpNode extends Node {
             case DIV:
                 result = leftNumber.div(rightNumber);
                 break;
+            case POW:
+                result = leftNumber.pow(rightNumber);
+                break;
             default:
                 result = null;
         }

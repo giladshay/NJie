@@ -124,6 +124,14 @@ public class Number {
     }
 
     /**
+     * Numer exponentiation.
+     * @param other Exponent.
+     * @return New number with the value of this ^ other.
+     */
+    public Number pow(Number other) {
+        return contextWrap(Number.binaryOpertion(this, other, (x, y) -> (float) Math.pow(x, y)));
+    }
+    /**
      * Number negation.
      * @return New number with the value of -this.
      */

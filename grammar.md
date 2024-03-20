@@ -3,6 +3,9 @@
 * **expr** *term* ((`+` | `-`) *term*)*
 * **term** *factor* ((`*` | `/`) *factor*)*
 * **factor** 
-    * INT | FLOAT 
     * (`+` | `-`) *factor*
+    * *power* 
+* **power** *atom* (`^` *factor*)*
+* **atom**
+    * INT | FLOAT 
     * `(`*expr*`)`

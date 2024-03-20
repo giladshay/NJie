@@ -10,6 +10,7 @@ public class Lexer {
         put('-', Token.Type.MIN);
         put('*', Token.Type.MUL);
         put('/', Token.Type.DIV);
+        put('^', Token.Type.POW);
         put('(', Token.Type.LPAREN);
         put(')', Token.Type.RPAREN);
     }};

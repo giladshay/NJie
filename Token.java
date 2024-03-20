@@ -11,6 +11,7 @@ class Token {
         MIN, 
         MUL, 
         DIV, 
+        POW, 
         LPAREN, 
         RPAREN, 
 
