@@ -15,5 +15,6 @@
 
 ## Variable
 * **assign** `VAR` varname[^1] `=` *expr*
+* **access** varname
 
 [^1]: We call the varname *identifier*.
