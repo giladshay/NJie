@@ -3,7 +3,7 @@
  * @author Gil-Ad Shay.
  */
 public class NumberNode extends Node {
-    private final Token number;
+    private final ValueableToken number;
 
     /**
      * Initialize a new NumberNode with the given number.
@@ -16,5 +16,23 @@ public class NumberNode extends Node {
     @Override
     public String toString() {
         return number.toString();
+    }
+
+    @Override
+    public Number visit(Context context) {
+        Number result = new Number(number.getValue());
+        result.setPosition(getStart(), getEnd());
+        result.setContext(context);
+        return result;
+    }
+
+    @Override
+    public Position getStart() {
+        return number.getStart();
+    }
+
+    @Override
+    public Position getEnd() {
+        return number.getEnd();
     }
 }

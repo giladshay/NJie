@@ -17,7 +17,14 @@ public class Main {
             Parser parser = new Parser(tokens);
             Node ast = parser.parse();
 
-            System.out.println(ast.toString());
+            // Initialize context
+            Context context = new Context("<program>");
+            
+            // Run program 
+            Number result = Interpreter.visit(ast, context);
+
+            // Show result
+            System.out.println(result);
         } catch (Error e) {
             System.out.println(e.toString());
         }

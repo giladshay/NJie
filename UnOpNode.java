@@ -1,3 +1,7 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.UnaryOperator;
+
 /**
  * Enables unary operation as -5.
  * @author Gil-Ad Shay.
@@ -19,6 +23,26 @@ public class UnOpNode extends Node {
     @Override
     public String toString() {
         return String.format("(%s, %s)", operator, operand);
+    }
+
+    @Override
+    public Number visit(Context context) throws RuntimeError {
+        Number result = operand.visit(context);
+        if (operator.getType() == Token.Type.MIN)
+            result = result.neg();
+        result.setPosition(getStart(), getEnd());
+        result.setContext(context);
+        return result;
+    }
+
+    @Override
+    public Position getStart() {
+        return operator.getStart();
+    }
+
+    @Override
+    public Position getEnd() {
+        return operand.getEnd();
     }
     
 }

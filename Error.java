@@ -23,11 +23,23 @@ public class Error extends Throwable {
         this.end = end;
     }
 
+    public Position getStart() {
+        return start;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%s: %s\n", name, details));
-        sb.append(String.format(">> File %s, line %d", start.getFN(), start.getLN() + 1));
+        sb.append(String.format(" > File %s, line %d", start.getFN(), start.getLN() + 1));
         return sb.toString();
     }
 }

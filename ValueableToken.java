@@ -30,6 +30,14 @@ public class ValueableToken extends Token {
             this.isInteger = true;
         }
 
+        /**
+         * Return either float or integer according to the state of the value.
+         * @return Float value of this 
+         */
+        public float getValue() { return value; }
+
+        public boolean isInteger() { return isInteger; }
+
         @Override
         public String toString() {
             return isInteger ? Integer.toString((int) value) : Float.toString(value);
@@ -61,6 +69,8 @@ public class ValueableToken extends Token {
         super(type, start);
         this.value = value;
     }
+
+    public Value getValue() { return value; }
     
     @Override
     public String toString() {
