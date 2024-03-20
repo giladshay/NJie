@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Class for tokens of type keywords.
@@ -8,21 +9,36 @@ import java.util.Map;
 public class KeywordToken extends Token {
     
     enum Keyword {
-        VAR
+        VAR, 
+        AND,
+        OR,
+        NOT
     }
 
-    public static final Map<String, KeywordToken.Keyword> KEYWORDS = new HashMap<>() {{
-        put("VAR", KeywordToken.Keyword.VAR);
+    public static final Map<String, Keyword> KEYWORDS = new HashMap<>() {{
+        put("VAR", Keyword.VAR);
+        put("AND", Keyword.AND);
+        put("OR", Keyword.OR);
+        put("NOT", Keyword.NOT);
     }};
 
-    private final KeywordToken.Keyword keyword;
+    private final Keyword keyword;
+
+    /**
+     * Initialize constant keyword token.
+     * @param keyword Keyword.
+     */
+    public KeywordToken(Keyword keyword) {
+        super(Token.Type.KEYWORD);
+        this.keyword = keyword;
+    }
 
     /**
      * Initialize new keyword token.
      * @param keyword Keyword of this token.
      * @param start Starting position.
      */
-    public KeywordToken(KeywordToken.Keyword keyword, Position start) {
+    public KeywordToken(Keyword keyword, Position start) {
         super(Token.Type.KEYWORD, start);
         this.keyword = keyword;
     }
@@ -33,11 +49,15 @@ public class KeywordToken extends Token {
      * @param start Starting position.
      * @param end Ending position.
      */
-    public KeywordToken(KeywordToken.Keyword keyword, Position start, Position end) {
+    public KeywordToken(Keyword keyword, Position start, Position end) {
         super(Token.Type.KEYWORD, start, end);
         this.keyword = keyword;
     }
 
+    public Keyword getKeyword() {
+        return keyword;
+    }
+    
     @Override
     public String toString() {
         return String.format("Keyword:%s", keyword);
@@ -45,6 +65,18 @@ public class KeywordToken extends Token {
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj) && obj instanceof KeywordToken && ((KeywordToken) obj).keyword == keyword;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        KeywordToken keywordToken = (KeywordToken) obj;
+        return super.equals(keywordToken) && keyword == keywordToken.keyword;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), keyword);
     }
 }

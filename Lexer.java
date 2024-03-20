@@ -13,7 +13,13 @@ public class Lexer {
         put('^', Token.Type.POW);
         put('(', Token.Type.LPAREN);
         put(')', Token.Type.RPAREN);
-        put('=', Token.Type.EQ);
+    }};
+
+    private final Map<Character, ThrowableSupplier<Token, ExpectedCharError>> CHARACTER_LOGICAL_COMPARISON = new HashMap<>() {{
+        put('!', Lexer.this::makeNotEquals);
+        put('=', Lexer.this::makeEquals);
+        put('<', Lexer.this::makeLessThan);
+        put('>', Lexer.this::makeGreaterThan);
     }};
     private final String fn, text;
     private final Position pos;
@@ -48,8 +54,9 @@ public class Lexer {
      * Tokenize the text into list of tokens.
      * @return List of tokens representing the text of the lexer.
      * @throws IllegalCharError when encountering an undefined character.
+     * @throws ExpectedCharError when encountering '!' not followed by '='.
      */
-    public List<Token> makeTokens() throws IllegalCharError {
+    public List<Token> makeTokens() throws IllegalCharError, ExpectedCharError {
         List<Token> tokens = new ArrayList<>();
 
         while (getCurrentChar() != NONE) {
@@ -66,6 +73,8 @@ public class Lexer {
             // Error
             } else if (Character.isAlphabetic(getCurrentChar())) {
                 tokens.add(makeIdentifierOrKeyword());
+            } else if (CHARACTER_LOGICAL_COMPARISON.containsKey(getCurrentChar())) {
+                tokens.add(CHARACTER_LOGICAL_COMPARISON.get(getCurrentChar()).get());
             } else {
                 Position start = pos.copy();
                 char c = getCurrentChar();
@@ -121,5 +130,72 @@ public class Lexer {
         return KeywordToken.KEYWORDS.containsKey(name) ? 
             new KeywordToken(KeywordToken.KEYWORDS.get(name), start, pos) :
             new IdentifierToken(name, start, pos);
+    }
+
+    /**
+     * Make NOT_EQUALS token.
+     * Check if the second character (first character is '!' because function was called) is '='. 
+     * @return NOT_EQUALS token if the second character is '='.
+     * @throws ExpectedCharError If the second character is not '='.
+     */
+    private Token makeNotEquals() throws ExpectedCharError {
+        Position start = pos.copy();
+        advance();
+
+        if (getCurrentChar() == '=') {
+            advance();
+            return new Token(Token.Type.NOT_EQUALS, start, pos);
+        }
+        advance();
+        throw new ExpectedCharError("'=' (after '!')", start, pos);
+    }
+
+    /**
+     * Helper method for changing the token type if needed.
+     * Used in makeEquals, makeGreaterThan, and makeLessThan.
+     * Check if current character equals to given character. If it is, return a token of a changed type. Otherwise, return a token of default character.
+     * @param defaultType Type if not changed.
+     * @param changed Type if changed.
+     * @param isChange Character to make a change.
+     * @return Token of type default type or changed type.
+     */
+    private Token changeTokenTypeIfNeeded(Token.Type defaultType, Token.Type changed, char isChange) {
+        Position start = pos.copy();
+        advance();
+        
+        Token.Type type = defaultType;
+        if (getCurrentChar() == isChange) {
+            advance();
+            type = changed;
+        }
+
+        return new Token(type, start, pos);
+    }
+
+    /**
+     * Make either ASSIGN token or EQUALS token.
+     * Check if second character (first is '=' because function was called) is also '='.
+     * @return ASSIGN token if second character equals '='. Otherwise, EQUALS token.
+     */
+    private Token makeEquals() {
+        return changeTokenTypeIfNeeded(Token.Type.ASSIGN, Token.Type.EQUALS, '=');
+    }
+
+    /**
+     * Make either LESS_THAN or LESS_THAN_OR_EQUALS token.
+     * Check if second character (first is '<' because function was called) is '='.
+     * @return LESS_THAN_OR_EQUALS token if second character equals '='. Otherwise, LESS_THAN token.
+     */
+    private Token makeLessThan() {
+        return changeTokenTypeIfNeeded(Token.Type.LESS_THAN, Token.Type.LESS_THAN_OR_EQUALS, '=');
+    }
+
+    /**
+     * Make either GREATER_THAN or GREATER_THAN_OR_EQUALS token.
+     * Check if second character (first is '>' because function was called) is '='.
+     * @return GREATER_THAN_OR_EQUALS token if second character equals '='. Otherwise, GREATER_THAN token.
+     */
+    private Token makeGreaterThan() {
+        return changeTokenTypeIfNeeded(Token.Type.GREATER_THAN, Token.Type.GREATER_THAN_OR_EQUALS, '=');
     }
 }

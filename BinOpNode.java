@@ -1,3 +1,7 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BinaryOperator;
+
 /**
  * Class for node which represents a binary opreation.
  * @author Gil-Ad Shay.
@@ -6,6 +10,22 @@ public class BinOpNode extends Node {
     private final Node leftChild;
     private final Node rightChild;
     private final Token operator;
+
+    private static final Map<Token, ThrowableBinaryOperator<Number, RuntimeError>> OPERATIONS = new HashMap<>() {{
+        put(new Token(Token.Type.PLUS), (x, y) -> x.add(y));
+        put(new Token(Token.Type.MIN), (x, y) -> x.sub(y));
+        put(new Token(Token.Type.MUL), (x, y) -> x.mul(y));
+        put(new Token(Token.Type.DIV), (x, y) -> x.div(y));
+        put(new Token(Token.Type.POW), (x, y) -> x.pow(y));
+        put(new Token(Token.Type.EQUALS), (x, y) -> x.eq(y));
+        put(new Token(Token.Type.NOT_EQUALS), (x, y) -> x.neq(y));
+        put(new Token(Token.Type.LESS_THAN), (x, y) -> x.lt(y));
+        put(new Token(Token.Type.LESS_THAN_OR_EQUALS), (x, y) -> x.lte(y));
+        put(new Token(Token.Type.GREATER_THAN), (x, y) -> x.gt(y));
+        put(new Token(Token.Type.GREATER_THAN_OR_EQUALS), (x, y) -> x.gte(y));
+        put(new KeywordToken(KeywordToken.Keyword.AND), (x, y) -> x.and(y));
+        put(new KeywordToken(KeywordToken.Keyword.OR), (x, y) -> x.or(y));
+    }};
 
     public BinOpNode(Node left, Token operator, Node right) {
         this.leftChild = left;
@@ -22,26 +42,7 @@ public class BinOpNode extends Node {
     public Number visit(Context context) throws RuntimeError {
         Number leftNumber = leftChild.visit(context);
         Number rightNumber = rightChild.visit(context);
-        Number result;
-        switch (operator.getType()) {
-            case PLUS:
-                result = leftNumber.add(rightNumber);
-                break;
-            case MIN:
-                result = leftNumber.sub(rightNumber);
-                break;
-            case MUL:
-                result = leftNumber.mul(rightNumber);
-                break;
-            case DIV:
-                result = leftNumber.div(rightNumber);
-                break;
-            case POW:
-                result = leftNumber.pow(rightNumber);
-                break;
-            default:
-                result = null;
-        }
+        Number result = OPERATIONS.get(operator).apply(leftNumber, rightNumber);
         result.setPosition(getStart(), getEnd());
         result.setContext(context);
         return result;

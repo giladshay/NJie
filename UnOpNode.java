@@ -26,8 +26,9 @@ public class UnOpNode extends Node {
         Number result = operand.visit(context);
         if (operator.getType() == Token.Type.MIN)
             result = result.neg();
+        else if (operator.equals(new KeywordToken(KeywordToken.Keyword.NOT)))
+            result = result.not();
         result.setPosition(getStart(), getEnd());
-        result.setContext(context);
         return result;
     }
 

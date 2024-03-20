@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 /**
  * The basic unit of our language.
  * @author Gil-Ad Shay.
@@ -18,7 +20,14 @@ class Token {
         IDENTIFIER, 
         KEYWORD,
 
-        EQ,
+        ASSIGN,
+
+        EQUALS,
+        NOT_EQUALS,
+        LESS_THAN,
+        GREATER_THAN,
+        LESS_THAN_OR_EQUALS,
+        GREATER_THAN_OR_EQUALS,
 
         EOF;
     }
@@ -26,6 +35,16 @@ class Token {
     private final Type type;
     private final Position start;
     private final Position end; 
+
+    /**
+     * Initialize a new constant token.
+     * @param type Type of constant.
+     */
+    public Token(Token.Type type) {
+        this.type = type;
+        this.start = null;
+        this.end = null;
+    }
 
     /**
      * Initialize new Token with given type.
@@ -75,6 +94,18 @@ class Token {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Token && ((Token) obj).type == type;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Token other = (Token) obj;
+        return type == other.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type);
     }
 }

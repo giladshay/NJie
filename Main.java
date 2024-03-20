@@ -32,7 +32,11 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        globalSymbolTable.set("null", new Number(new ValueableToken.Value(0)));
+        // Initialize global symbol table
+        globalSymbolTable.set("NULL", new Number(new ValueableToken.Value(0)));
+        globalSymbolTable.set("TRUE", new Number(Number.TRUE));
+        globalSymbolTable.set("FALSE", new Number(Number.FALSE));
+
         String cmd;
         while (true) {
             System.out.print("basic > ");

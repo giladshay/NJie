@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 /**
  * Tokens with value, i.e. INT and FLOAT.
  * @author Gil-Ad Shay. 
@@ -50,7 +52,19 @@ public class ValueableToken extends Token {
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Value && ((Value) obj).value == value && ((Value) obj).isInteger == isInteger;
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            Value value = (Value) obj;
+            return super.equals(value) && this.value == value.value && this.isInteger == value.isInteger;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value, isInteger);
         }
     }
 
@@ -89,6 +103,18 @@ public class ValueableToken extends Token {
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj) && obj instanceof ValueableToken && ((ValueableToken) obj).getValue().equals(getValue());
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ValueableToken valueableToken = (ValueableToken) obj;
+        return super.equals(valueableToken) && value == valueableToken.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value.hashCode());
     }
 }
