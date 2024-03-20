@@ -15,7 +15,12 @@ class Token {
         LPAREN, 
         RPAREN, 
 
-        EOF
+        IDENTIFIER, 
+        KEYWORD,
+
+        EQ,
+
+        EOF;
     }
 
     private final Type type;
@@ -42,10 +47,15 @@ class Token {
      */
     public Token(Token.Type type, Position start) {
         this.type = type;
-        this.start = start.copy();
-        Position temp = start.copy();
-        temp.advance();
-        this.end = temp.copy();
+        if (start != null) {
+            this.start = start.copy();
+            Position temp = start.copy();
+            temp.advance();
+            this.end = temp.copy();
+        } else {
+            this.start = null;
+            this.end = null;
+        }
     }
 
     public Type getType() {
@@ -61,5 +71,10 @@ class Token {
     @Override
     public String toString() {
         return type.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Token && ((Token) obj).type == type;
     }
 }

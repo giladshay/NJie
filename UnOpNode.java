@@ -1,7 +1,3 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.UnaryOperator;
-
 /**
  * Enables unary operation as -5.
  * @author Gil-Ad Shay.

@@ -1,7 +1,6 @@
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * Class for parsing tokens into tree.
@@ -69,6 +68,7 @@ public class Parser {
      * Create the tree in the case of factor according to grammar rules.
      * Recall the atom case is either:
      * INT | FLOAT
+     * IDENTIFIER
      * LPAREN expr RPAREN
      * @return
      * @throws InvalidSyntaxError
@@ -79,6 +79,10 @@ public class Parser {
         if (currentToken.getType() == Token.Type.INT || currentToken.getType() == Token.Type.FLOAT) {
             advance();
             return new NumberNode((ValueableToken) currentToken); 
+        // IDENTIFIER
+        } else if (currentToken.getType() == Token.Type.IDENTIFIER) {
+            advance();
+            return new VarAccessNode((IdentifierToken) currentToken);
         // LPAREN expr RPAREN   
         } else if (currentToken.getType() == Token.Type.LPAREN) {
             advance();
@@ -89,7 +93,7 @@ public class Parser {
             }
             throw new InvalidSyntaxError("Expected ')'", getCurrentToken().getStart(), getCurrentToken().getEnd());
         } else {
-            throw new InvalidSyntaxError("Expected INT, FLOAT, '+', '-', or ')'", currentToken.getStart(), currentToken.getEnd());
+            throw new InvalidSyntaxError("Expected INT, FLOAT, IDENTIFIER, '+', '-', or ')'", currentToken.getStart(), currentToken.getEnd());
         }
     }
 
@@ -144,14 +148,39 @@ public class Parser {
      * Create the tree in the case of expr according to grammar rules.
      * Recall the expr case is:
      * term ((+ | -) term)*
+     * VAR varname = expr
      * @return Node with the tree of the expression.
      * @throws InvalidSyntaxError Where encountering invalid syntax.
      */
     private Node expr() throws InvalidSyntaxError {
-        return binaryOperation(this::term, new HashSet<>() {{
-            add(Token.Type.PLUS);
-            add(Token.Type.MIN);
-        }});
+        int currentIndex = idx;
+        // VAR varname = expr
+        if (getCurrentToken().equals(new KeywordToken(KeywordToken.Keyword.VAR, null))) {
+            advance();
+            if (getCurrentToken().getType() != Token.Type.IDENTIFIER) {
+                throw new InvalidSyntaxError("Expected identifier", getCurrentToken().getStart(), getCurrentToken().getEnd());
+            }
+            IdentifierToken varName = (IdentifierToken) getCurrentToken();
+            advance();
+            if (getCurrentToken().getType() != Token.Type.EQ) {
+                throw new InvalidSyntaxError("Expected '='", getCurrentToken().getStart(), getCurrentToken().getEnd());
+            }
+            advance();
+            Node expr = expr();
+            return new VarAssignNode(varName, expr);
+        }
+        try {
+            // term ((+ | -) term)*
+            return binaryOperation(this::term, new HashSet<>() {{
+                add(Token.Type.PLUS);
+                add(Token.Type.MIN);
+            }});
+        } catch (InvalidSyntaxError ise) {
+            if (currentIndex != idx) // if we have advanced, do not override.
+                throw ise;
+            else
+                throw new InvalidSyntaxError("Expected INT, FLOAT, IDENTIFIER, 'VAR', '+', '-', or '('", getCurrentToken().getStart(), getCurrentToken().getEnd());
+        }
     }
 
     /**

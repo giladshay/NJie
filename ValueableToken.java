@@ -30,17 +30,27 @@ public class ValueableToken extends Token {
             this.isInteger = true;
         }
 
+        protected Value(Value value) {
+            this.value = value.value;
+            this.isInteger = value.isInteger;
+        }
+
         /**
          * Return either float or integer according to the state of the value.
          * @return Float value of this 
          */
-        public float getValue() { return value; }
+        protected float getValue() { return value; }
 
-        public boolean isInteger() { return isInteger; }
+        protected boolean isInteger() { return isInteger; }
 
         @Override
         public String toString() {
             return isInteger ? Integer.toString((int) value) : Float.toString(value);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Value && ((Value) obj).value == value && ((Value) obj).isInteger == isInteger;
         }
     }
 
@@ -75,5 +85,10 @@ public class ValueableToken extends Token {
     @Override
     public String toString() {
         return String.format("%s:%s", super.toString(), this.value.toString());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj) && obj instanceof ValueableToken && ((ValueableToken) obj).getValue().equals(getValue());
     }
 }

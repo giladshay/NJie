@@ -6,6 +6,7 @@ import java.util.Scanner;
  * @author Gil-Ad Shay.
  */
 public class Main {
+    private static final SymbolTable globalSymbolTable = new SymbolTable();
     private static Scanner input = new Scanner(System.in);
     private static void run(String text) {
         try {
@@ -18,7 +19,7 @@ public class Main {
             Node ast = parser.parse();
 
             // Initialize context
-            Context context = new Context("<program>");
+            Context context = new Context("<program>", globalSymbolTable);
             
             // Run program 
             Number result = Interpreter.visit(ast, context);
@@ -31,6 +32,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        globalSymbolTable.set("null", new Number(new ValueableToken.Value(0)));
         String cmd;
         while (true) {
             System.out.print("basic > ");

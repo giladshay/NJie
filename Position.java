@@ -35,6 +35,9 @@ public class Position {
     public int getLN() { return ln; }
     public String getFN() {return fn; }
     public String getText() {  return ftxt; }
+    public int getCol() {
+        return col;
+    }
 
     public Position copy() {
         Position copy = new Position(fn, ftxt);

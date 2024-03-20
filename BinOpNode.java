@@ -1,7 +1,3 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BinaryOperator;
-
 /**
  * Class for node which represents a binary opreation.
  * @author Gil-Ad Shay.

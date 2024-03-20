@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Lexer {
-    private static final char none = '\0';
-    private static final Map<Character, Token.Type> charOperators = new HashMap<>() {{
+    private static final char NONE = '\0';
+    private static final Map<Character, Token.Type> CHARACTER_OPERATORS = new HashMap<>() {{
         put('+', Token.Type.PLUS);
         put('-', Token.Type.MIN);
         put('*', Token.Type.MUL);
@@ -13,6 +13,7 @@ public class Lexer {
         put('^', Token.Type.POW);
         put('(', Token.Type.LPAREN);
         put(')', Token.Type.RPAREN);
+        put('=', Token.Type.EQ);
     }};
     private final String fn, text;
     private final Position pos;
@@ -40,7 +41,7 @@ public class Lexer {
      * @return Current character in the text.
      */
     private char getCurrentChar() {
-        return pos.getIdx() < text.length() ? text.charAt(pos.getIdx()) : none;
+        return pos.getIdx() < text.length() ? text.charAt(pos.getIdx()) : NONE;
     }
 
     /**
@@ -51,18 +52,20 @@ public class Lexer {
     public List<Token> makeTokens() throws IllegalCharError {
         List<Token> tokens = new ArrayList<>();
 
-        while (getCurrentChar() != none) {
+        while (getCurrentChar() != NONE) {
             // ignore ' ' and '\t'
             if (getCurrentChar() == ' ' || getCurrentChar() == '\t') {
                 advance();
             // +, -, *, /, (, or )
-            } else if (charOperators.containsKey(getCurrentChar())) {
-                tokens.add(new Token(charOperators.get(getCurrentChar()), pos));
+            } else if (CHARACTER_OPERATORS.containsKey(getCurrentChar())) {
+                tokens.add(new Token(CHARACTER_OPERATORS.get(getCurrentChar()), pos));
                 advance();
             // Numbers
             } else if (Character.isDigit(getCurrentChar())) {
                 tokens.add(makeNumber());
             // Error
+            } else if (Character.isAlphabetic(getCurrentChar())) {
+                tokens.add(makeIdentifierOrKeyword());
             } else {
                 Position start = pos.copy();
                 char c = getCurrentChar();
@@ -84,7 +87,7 @@ public class Lexer {
         boolean isThereDot = false;
 
         Position start = pos.copy();
-        while (getCurrentChar() != none && (Character.isDigit(getCurrentChar()) || getCurrentChar() == '.')) {
+        while (getCurrentChar() != NONE && (Character.isDigit(getCurrentChar()) || getCurrentChar() == '.')) {
             if (getCurrentChar() == '.') {
                 if (isThereDot)
                     break;
@@ -99,5 +102,24 @@ public class Lexer {
             new ValueableToken.Value(Float.valueOf(number.toString())) :
             new ValueableToken.Value(Integer.valueOf(number.toString()));
         return new ValueableToken(type, value, start, pos);
+    }
+
+    /**
+     * Check for alphabetical token and return a keyword token or an identifier token based on whether the input is a keyword.
+     * @return Keyword token if it is a keyword. Otherwise, identifier token.
+     */
+    private Token makeIdentifierOrKeyword() {
+        StringBuilder id = new StringBuilder();
+        Position start = pos.copy();
+
+        while (getCurrentChar() != NONE && (Character.isAlphabetic(getCurrentChar()) || Character.isDigit(getCurrentChar()))) {
+            id.append(getCurrentChar());
+            advance();
+        }
+
+        String name = id.toString();
+        return KeywordToken.KEYWORDS.containsKey(name) ? 
+            new KeywordToken(KeywordToken.KEYWORDS.get(name), start, pos) :
+            new IdentifierToken(name, start, pos);
     }
 }

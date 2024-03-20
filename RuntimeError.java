@@ -40,6 +40,7 @@ public class RuntimeError extends Error {
         StringBuilder sb = new StringBuilder();
         sb.append(generateTraceback());
         sb.append(String.format("%s: %s\n", getName(), getDetails()));
+        sb.append("\n\n" + stringWithArrows());
         return sb.toString();
     }
 }
