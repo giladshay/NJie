@@ -15,7 +15,7 @@ public abstract class Node {
      * @return Number with the result of the visit.
      * @throws RuntimeError If there is a runtime error during the run of the program.
      */
-    public abstract Number visit(Context context) throws RuntimeError;
+    public abstract MyNumber visit(Context context) throws RuntimeError;
 
     /**
      * Get the starting position for this node.

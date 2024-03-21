@@ -78,7 +78,7 @@ public class Parser {
         // INT | FLOAT
         if (currentToken.getType() == Token.Type.INT || currentToken.getType() == Token.Type.FLOAT) {
             advance();
-            return new NumberNode((ValueableToken) currentToken); 
+            return new NumberNode((NumericToken) currentToken); 
         // IDENTIFIER
         } else if (currentToken.getType() == Token.Type.IDENTIFIER) {
             advance();

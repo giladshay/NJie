@@ -19,9 +19,9 @@ public class VarAccessNode extends Node {
     }
 
     @Override
-    public Number visit(Context context) throws RuntimeError {
+    public MyNumber visit(Context context) throws RuntimeError {
         String name = varName.getName(); 
-        Number value = context.getSymbolTable().get(name);
+        MyNumber value = context.getSymbolTable().get(name);
 
         if (value == null)
             throw new RuntimeError(String.format("%s is not defined", name), getStart(), getEnd(), context);

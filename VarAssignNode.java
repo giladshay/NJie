@@ -23,9 +23,9 @@ public class VarAssignNode extends Node {
     }
 
     @Override
-    public Number visit(Context context) throws RuntimeError {
+    public MyNumber visit(Context context) throws RuntimeError {
         String name = varName.getName();
-        Number numberValue = value.visit(context);
+        MyNumber numberValue = value.visit(context);
         context.getSymbolTable().set(name, numberValue);
         return numberValue;
     }

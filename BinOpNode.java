@@ -11,7 +11,7 @@ public class BinOpNode extends Node {
     private final Node rightChild;
     private final Token operator;
 
-    private static final Map<Token, ThrowableBinaryOperator<Number, RuntimeError>> OPERATIONS = new HashMap<>() {{
+    private static final Map<Token, ThrowableBinaryOperator<MyNumber, RuntimeError>> OPERATIONS = new HashMap<>() {{
         put(new Token(Token.Type.PLUS), (x, y) -> x.add(y));
         put(new Token(Token.Type.MIN), (x, y) -> x.sub(y));
         put(new Token(Token.Type.MUL), (x, y) -> x.mul(y));
@@ -23,8 +23,8 @@ public class BinOpNode extends Node {
         put(new Token(Token.Type.LESS_THAN_OR_EQUALS), (x, y) -> x.lte(y));
         put(new Token(Token.Type.GREATER_THAN), (x, y) -> x.gt(y));
         put(new Token(Token.Type.GREATER_THAN_OR_EQUALS), (x, y) -> x.gte(y));
-        put(new KeywordToken(KeywordToken.Keyword.AND), (x, y) -> x.and(y));
-        put(new KeywordToken(KeywordToken.Keyword.OR), (x, y) -> x.or(y));
+        put(new KeywordToken(KeywordToken.Keyword.AND), (x, y) -> ((MyBoolean) x).and((MyBoolean) y));
+        put(new KeywordToken(KeywordToken.Keyword.OR), (x, y) -> ((MyBoolean) x).or((MyBoolean) y));
     }};
 
     public BinOpNode(Node left, Token operator, Node right) {
@@ -39,10 +39,10 @@ public class BinOpNode extends Node {
     }
 
     @Override
-    public Number visit(Context context) throws RuntimeError {
-        Number leftNumber = leftChild.visit(context);
-        Number rightNumber = rightChild.visit(context);
-        Number result = OPERATIONS.get(operator).apply(leftNumber, rightNumber);
+    public MyNumber visit(Context context) throws RuntimeError {
+        MyNumber leftNumber = leftChild.visit(context);
+        MyNumber rightNumber = rightChild.visit(context);
+        MyNumber result = OPERATIONS.get(operator).apply(leftNumber, rightNumber);
         result.setPosition(getStart(), getEnd());
         result.setContext(context);
         return result;

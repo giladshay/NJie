@@ -91,7 +91,7 @@ public class Lexer {
      * Check if it is a float or an integer and return matching token.
      * @return ValueableToken representing sequence of digits and '.'. If the number is float, return ValueableToken of type FLOAT, and otherwise of type INT.
      */
-    private ValueableToken makeNumber() {
+    private NumericToken makeNumber() {
         StringBuilder number = new StringBuilder();
         boolean isThereDot = false;
 
@@ -107,10 +107,10 @@ public class Lexer {
         }
 
         Token.Type type = isThereDot ? Token.Type.FLOAT : Token.Type.INT;
-        ValueableToken.Value value = isThereDot ? 
-            new ValueableToken.Value(Float.valueOf(number.toString())) :
-            new ValueableToken.Value(Integer.valueOf(number.toString()));
-        return new ValueableToken(type, value, start, pos);
+        MyNumber value = isThereDot ? 
+            new MyNumber(Float.valueOf(number.toString())):
+            new MyNumber(Integer.valueOf(number.toString()));
+        return new NumericToken(type, value, start, pos);
     }
 
     /**

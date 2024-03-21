@@ -6,7 +6,7 @@ import java.util.Map;
  * @author Gil-Ad Shay.
  */
 public class SymbolTable {
-    private final Map<String, Number> symbols;
+    private final Map<String, MyNumber> symbols;
     private final SymbolTable parent;
 
     /**
@@ -22,8 +22,8 @@ public class SymbolTable {
      * @param name Given name.
      * @return The value of the variable in the symbol table. null if not found.
      */
-    public Number get(String name) {
-        Number value = symbols.getOrDefault(name, null);
+    public MyNumber get(String name) {
+        MyNumber value = symbols.getOrDefault(name, null);
         if (value == null && parent != null)
             return parent.get(name);
         return value;
@@ -34,7 +34,7 @@ public class SymbolTable {
      * @param name Name of variable.
      * @param value New value to assign.
      */
-    public void set(String name, Number value) {
+    public void set(String name, MyNumber value) {
         symbols.put(name, value);
     }
 

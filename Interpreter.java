@@ -9,7 +9,7 @@ public class Interpreter {
      * @param context Context of the program for tracking errors.
      * @throws RuntimeError In case of a runtime error.
      */
-    public static Number visit(Node node, Context context) throws RuntimeError {
+    public static MyNumber visit(Node node, Context context) throws RuntimeError {
        return node.visit(context);
     }
 }

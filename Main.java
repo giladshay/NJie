@@ -22,7 +22,7 @@ public class Main {
             Context context = new Context("<program>", globalSymbolTable);
             
             // Run program 
-            Number result = Interpreter.visit(ast, context);
+            MyNumber result = Interpreter.visit(ast, context);
 
             // Show result
             System.out.println(result);
@@ -33,9 +33,9 @@ public class Main {
 
     public static void main(String[] args) {
         // Initialize global symbol table
-        globalSymbolTable.set("NULL", new Number(new ValueableToken.Value(0)));
-        globalSymbolTable.set("TRUE", new Number(Number.TRUE));
-        globalSymbolTable.set("FALSE", new Number(Number.FALSE));
+        globalSymbolTable.set("NULL", new MyNumber(0));
+        globalSymbolTable.set("TRUE", new MyBoolean(true));
+        globalSymbolTable.set("FALSE", new MyBoolean(false));
 
         String cmd;
         while (true) {

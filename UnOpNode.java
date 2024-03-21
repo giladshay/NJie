@@ -22,12 +22,12 @@ public class UnOpNode extends Node {
     }
 
     @Override
-    public Number visit(Context context) throws RuntimeError {
-        Number result = operand.visit(context);
+    public MyNumber visit(Context context) throws RuntimeError {
+        MyNumber result = operand.visit(context);
         if (operator.getType() == Token.Type.MIN)
             result = result.neg();
         else if (operator.equals(new KeywordToken(KeywordToken.Keyword.NOT)))
-            result = result.not();
+            result = ((MyBoolean) result).not();
         result.setPosition(getStart(), getEnd());
         return result;
     }
